@@ -142,6 +142,9 @@ def correlations():
     
     df_2330.rename(columns = {'malvar':'count'}, inplace = True)
     df_2330.rename(columns = {'nedør':'precipitation', 'vind':'wind'}, inplace = True)
+
+    first_column = df_2330.pop('count')
+    df_2330.insert(0, 'count', first_column)
     corr2330 = df_2330.corr()
     
     sns.heatmap(corr2330, xticklabels= True, yticklabels= True, vmin=-1, vmax=1, cmap='BrBG')
@@ -151,12 +154,15 @@ def correlations():
 
     df_405.rename(columns = {'malvar':'count', 'vind':'wind','nedør':'precipitation'}, inplace = True)
     print(df_405.info())
+    first_column = df_405.pop('count')
+    df_405.insert(0, 'count', first_column)
     corr405 = df_405.corr()
     print(corr405)
     sns.heatmap(corr405, xticklabels= True, yticklabels= True, vmin=-1, vmax=1, cmap='BrBG')
     plt.title("Correlation matrix station 405")
     plt.show()
-#correlations()
+correlations()
+
 import math
 def meanCountperHour():
     mean_counts = []
@@ -171,5 +177,5 @@ def meanCountperHour():
     plt.title("Histogram of hourly checkout standard deviation")
     plt.show() 
 
-meanCountperHour()   
+#meanCountperHour()   
 #getAllData(station=405)
