@@ -21,34 +21,11 @@ import json
 
 Forest = RandomForestRegressor(random_state = 666, n_estimators = 500)
 
-def rmsle(y, y_):
-    log1 = np.nan_to_num(np.array([np.log(v + 1) for v in y]))
-    log2 = np.nan_to_num(np.array([np.log(v + 1) for v in y_]))
-    calc = (log1 - log2) ** 2
-    return np.sqrt(np.mean(calc))
-
-from sklearn.metrics import mean_absolute_error
-from sklearn.metrics import mean_squared_error
-
-def mae(y, y_):
-    return mean_absolute_error(y, y_, multioutput='raw_values')
 
 #dicttest = dict({"hei":2, "balle":2})
 #with open('results/CI_pred.json', 'w') as fp:
  #       json.dump(dicttest, fp)
 
-def feature_importance(trained_model, columns):
-    """"returns imortance of each feature for a model"""
-    importances = trained_model.feature_importances_
-    #
-    # Sort the feature importance in descending order
-    #
-    sorted_indices = np.argsort(importances)[::-1]
-    
-    feat_labels = columns
-    importances = pd.DataFrame(importances, columns)
-    
-    return importances
 
 def trainRandom(X_train, Y_train, station):
     t0 = time()
@@ -71,25 +48,7 @@ def trainRandom(X_train, Y_train, station):
     
     print(f"training for station {station}, took {train_time}")
     return rf
-    test_pred = Forest.predict(X_test)
-
-    r2 = r2_score(Y_test, test_pred)
-    print(Y_test)
-    
-    plt.plot(Y_test.values, label="GT")
-    plt.plot(test_pred, label="RF")
-    plt.title(f'Ground truth VS prediction station {station}')
-    plt.legend()
-    plt.show()
-    
-    root_mean_squared_log_error = rmsle(Y_test, test_pred)
-    print ("r2_score of testing set is {}".format(r2))
-    print ("Root mean squared log error is {}".format(root_mean_squared_log_error))
-    print ("mean absolute error is {}".format(mae(Y_test, test_pred)))
-    mse = mean_squared_error(Y_test, test_pred)
-    improtances = feature_importance(Forest, X_train.columns)
-    return improtances, mse, root_mean_squared_log_error, r2
-
+   
 
 def Average(lst):
     return sum(lst) / len(lst)
@@ -146,7 +105,9 @@ def predictCheckIns(prob_station, Y_dict, i, stations):
     return count
 
 pd.options.mode.chained_assignment = None
+
 def Main(pred_periods):
+    """Implements the random prediction model for the given number of periods"""
     stations = findAllStations(2022, 8)
     stations = list(stations["station_id"])
     stations.remove(602)

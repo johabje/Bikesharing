@@ -36,7 +36,7 @@ def stationDistances(year, month):
     """Finds all stations within 500 meters of each station, and returns a dict with all stations, and their closest stations"""
     from haversine import haversine
     stations_dist = dict()
-    #dict with stations, containig all stations within 500 meters, shuld be sorted by distance
+    #dict with stations, containig all stations within 500 meters, should be sorted by distance
     stations = findAllStations(year, month)
     for index, row in stations.iterrows():
         #print(row)
@@ -55,7 +55,7 @@ def stationDistances(year, month):
 #stationDistances(2020, 5)
 
 def findAvailability(year,month, day, hour, min, station_id, df):
-    """finds the number of available bikes at a given station at a given time, returns 0 if no data is available"""
+    """Finds the number of available bikes at a given station at a given time, returns 0 if no data is available"""
     dt = pd.to_datetime(f"{year}-{month}-{day} {hour}:{min}:00.000")
     df.index = pd.to_datetime(df.index)
     s = df.loc[df.index.unique()[df.index.unique().get_loc(dt, method='nearest')]]
@@ -245,7 +245,7 @@ def checkInCounts():
     with open('results3/CI_true.json', 'w') as fp:
         json.dump(CI_true, fp)
 
-#checkInCounts()
+checkInCounts()
 def stationDistancesMod(year, month):
     """Finds all stations within 500 meters of each station, returns only station ids sorted by distance"""
     from haversine import haversine
@@ -363,7 +363,7 @@ def addMeanCountLastHour(station, close_stations):
             print(fails)
 
 
-#close_stations=stationDistancesMod(2022, 8)
+close_stations=stationDistancesMod(2022, 8)
 
 
 

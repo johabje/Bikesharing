@@ -21,7 +21,10 @@ def findAllStationsMod(year, month):
     df = pd.read_csv(f"tripdata/{year}/{m.zfill(2)}.csv")
     df.drop_duplicates(subset=["start_station_id"],inplace=True)
 
-    df.drop(["started_at","ended_at","duration","start_station_name","start_station_description","end_station_id",'start_station_longitude','start_station_latitude',"end_station_name","end_station_description","end_station_latitude","end_station_longitude"], axis = 1, inplace = True)
+    df.drop(["started_at","ended_at","duration","start_station_name",
+    "start_station_description","end_station_id",'start_station_longitude',
+    'start_station_latitude',"end_station_name","end_station_description",
+    "end_station_latitude","end_station_longitude"], axis = 1, inplace = True)
     
     #print(df.head(20))
     return df
