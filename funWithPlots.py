@@ -21,7 +21,10 @@ def findAllStationsMod(year, month):
     df = pd.read_csv(f"tripdata/{year}/{m.zfill(2)}.csv")
     df.drop_duplicates(subset=["start_station_id"],inplace=True)
 
-    df.drop(["started_at","ended_at","duration","start_station_name","start_station_description","end_station_id",'start_station_longitude','start_station_latitude',"end_station_name","end_station_description","end_station_latitude","end_station_longitude"], axis = 1, inplace = True)
+    df.drop(["started_at","ended_at","duration","start_station_name",
+    "start_station_description","end_station_id",'start_station_longitude',
+    'start_station_latitude',"end_station_name","end_station_description",
+    "end_station_latitude","end_station_longitude"], axis = 1, inplace = True)
     
     #print(df.head(20))
     return df
@@ -223,14 +226,53 @@ def tripsToStationsCDF():
     df = pd.DataFrame({'y': y, 'x': x} )
     print(df.loc[df['y'] > 0.99990000])
     print(df.loc[df['y'] > 0.990000])
+
+    plt.subplot(1, 2, 1)
     plt.plot(x, y)
     plt.xlabel("Stations")
     plt.ylabel("Percentage of trips")
     plt.title("CDF ")
     plt.legend()
+    years = os.listdir("tripdata")
+    years.remove('.DS_Store')
+    yearly = dict()
+    final = dict()
+    length = 0
+
+    for month in range(1,13):
+        df = pd.read_csv(f'tripdata/2021/{str(month).zfill(2)}.csv')
+        df2 = df.loc[df['end_station_id'] == 423]
+        length += len(df2)
+        lst = [Counter(df2['start_station_id'])]
+        res = sum(lst, Counter())
+        res = list(res.items())
+        for key, value in res:
+            final[key] = final.get(key, 0) + int(value)
+    
+    print(final.values())
+    arr = np.array(list(final.values()))
+    x = np.array(range(1,len(arr)+1))
+    arr = -np.sort(-arr)
+    print(arr)
+    summ = np.sum(arr)
+    print(summ)
+    print(length)
+    y = []
+    for i in x:
+        y.append(np.sum(arr[0:i])/summ)
+    df = pd.DataFrame({'y': y, 'x': x} )
+    print(df.loc[df['y'] > 0.99990000])
+    print(df.loc[df['y'] > 0.990000])
+    plt.subplot(1, 2, 2)
+    plt.plot(x, y)
+    plt.xlabel("Stations")
+    plt.ylabel("Percentage of trips")
+    plt.title("CDF ")
+    plt.legend()
+
     plt.show()
 
-#tripsToStationsCDF()
+tripsToStationsCDF()
 
 def varianceStationPairs(list):
     path = "tripdata/2022"

@@ -21,6 +21,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 
 def findAllStations(year, month):
+    """Finds all stations in a given month, and returns a dataframe with all stations, and their lat/long"""
     m = str(month)
     df = pd.read_csv(f"tripdata/{year}/{m.zfill(2)}.csv")
     df.drop_duplicates(subset=["start_station_id"],inplace=True)
@@ -32,6 +33,7 @@ def findAllStations(year, month):
 
 
 def stationDistances(year, month):
+    """Finds all stations within 500 meters of each station, and returns a dict with all stations, and their closest stations"""
     from haversine import haversine
     stations_dist = dict()
     #dict with stations, containig all stations within 500 meters, shuld be sorted by distance
@@ -52,8 +54,9 @@ def stationDistances(year, month):
     return stations_dist, stations["station_id"]
 #stationDistances(2020, 5)
 
-def findAvailability(year,month, day, hour, station_id, df):
-    dt = pd.to_datetime(f"{year}-{month}-{day} {hour}:00:00.000")
+def findAvailability(year,month, day, hour, min, station_id, df):
+    """finds the number of available bikes at a given station at a given time, returns 0 if no data is available"""
+    dt = pd.to_datetime(f"{year}-{month}-{day} {hour}:{min}:00.000")
     df.index = pd.to_datetime(df.index)
     s = df.loc[df.index.unique()[df.index.unique().get_loc(dt, method='nearest')]]
     try:
@@ -62,6 +65,7 @@ def findAvailability(year,month, day, hour, station_id, df):
         return s["num_bikes_available"]
 
 def getweather(year,month, day, hour, df):
+    """finds the weather at a given time, returns 0 if no data is available"""
     dt = pd.to_datetime(f"{year}-{month}-{day} {hour}:00:00.000")
     df.index = pd.to_datetime(df.index)
     s = df.loc[dt]
@@ -72,6 +76,7 @@ def getweather(year,month, day, hour, df):
 
 
 def getTripCount(year,month, day, hour, df):
+    """finds the number of trips at a given time imterval, returns 0 if no data is available"""
     dt = pd.to_datetime(f"{year}-{month}-{day} {hour}:00:00.000")
     count = df.resample("H").agg({'count':'sum'})
     try:
@@ -115,45 +120,46 @@ def main():
                             print("no availabiliy")
                     if len(avails) == 0: continue
                     for hour in range(0, 24):
+                        for min in range(0,61,15):
                         #available bikes per station
-                        row = dict()
-                        if stations_dist[station] == []:
-                            break
-                        count=0
-                        
-                        for closestation in stations_dist[station]:
-                            print(closestation)
-                            try:
-                                row[f'availability {count}'] = findAvailability(year, month, day, hour, closestation[0], avails[count])
-                            except:
-                                row[f'availability {count}'] = None
-                            count+=1
-                        #weather
-                        try:
-                            nedbør, temp, vind = getweather(year, month, day, hour, df_w)
-                            row["nedør"] = nedbør
-                            row["temp"] = temp 
-                            row["vind"] = vind
-                            row["hour"] = hour
+                            row = dict()
+                            if stations_dist[station] == []:
+                                break
+                            count=0
                             
-                        except:
-                            print("no weather data")
-                            continue
-                        row["count"] = getTripCount(year, month, day, hour, tripdata)
-                        #get current availability
-                        last_hour= hour-1
-                        if last_hour == -1:
-                            row["count_last_hour"] = None
-                        else: row["count_last_hour"] = getTripCount(year, month, day, last_hour, tripdata)
-                        
-                        hour = hour+1
-                        if hour == 24: hour=0
-                        row["dateTime"] = pd.to_datetime(f"{year}-{month}-{day} {hour}:00:00.000")
-                        dato = date(year, month, day)
-                        row["isHoliday"] = dato in no_holidays
-                        row["weekday"] = dato.weekday()
-                        #print(f"the row is: {row}")
-                        month_data.append(row)
+                            for closestation in stations_dist[station]:
+                                print(closestation)
+                                try:
+                                    row[f'availability {count}'] = findAvailability(year, month, day, hour, min, closestation[0], avails[count])
+                                except:
+                                    row[f'availability {count}'] = None
+                                count+=1
+                            #weather
+                            try:
+                                nedbør, temp, vind = getweather(year, month, day, hour, df_w)
+                                row["precititation"] = nedbør
+                                row["temp"] = temp 
+                                row["Wind"] = vind
+                                row["hour"] = hour
+                                
+                            except:
+                                print("no weather data")
+                                continue
+                            row["count"] = getTripCount(year, month, day, hour, tripdata)
+                            #get current availability
+                            last_hour= hour-1
+                            if last_hour == -1:
+                                row["count_last_hour"] = None
+                            else: row["count_last_hour"] = getTripCount(year, month, day, last_hour, tripdata)
+                            
+                            hour = hour+1
+                            if hour == 24: hour=0
+                            row["dateTime"] = pd.to_datetime(f"{year}-{month}-{day} {hour}:00:00.000")
+                            dato = date(year, month, day)
+                            row["isHoliday"] = dato in no_holidays
+                            row["weekday"] = dato.weekday()
+                            #print(f"the row is: {row}")
+                            month_data.append(row)
                 month_data = pd.DataFrame.from_dict(month_data, orient='columns')
                 
                 if month_data.size == 0: continue
@@ -164,6 +170,7 @@ def main():
                 month_data.to_csv(f'finalData/{year}/{month}/{station}.csv',index=False)
 
 def addMonth():
+    """Adds a month column to the csv files"""
     for year in os.listdir("finalData"):
         for month in os.listdir(f'finalData/{year}'):
             for station in os.listdir(f'finalData/{year}/{month}'):
@@ -176,11 +183,9 @@ def addMonth():
                 df.to_csv(path, index=False)
 
 
-#kjør igjen for 577!
-#addMonth()
-#main()
 
 def findAllStations_in(year, month):
+    """Finds all stations in a given month"""
     m = str(month)
     df = pd.read_csv(f"tripdata/{year}/{m.zfill(2)}.csv")
     df.drop_duplicates(subset=["start_station_id"],inplace=True)
@@ -194,6 +199,7 @@ def findAllStations_in(year, month):
 
 import json
 def checkInCounts():
+    """creates a Json dictionary with the check in counts for each station each hour in the prediction period"""
     f4 = open('results3/CI_pred.json')
     stations = list(json.load(f4).keys())
 
@@ -239,11 +245,12 @@ def checkInCounts():
     with open('results3/CI_true.json', 'w') as fp:
         json.dump(CI_true, fp)
 
-checkInCounts()
+#checkInCounts()
 def stationDistancesMod(year, month):
+    """Finds all stations within 500 meters of each station, returns only station ids sorted by distance"""
     from haversine import haversine
     stations_dist = dict()
-    #dict with stations, containig all stations within 500 meters, shuld be sorted by distance
+    #dict with stations, containig all stations within 500 meters, should be sorted by distance
     stations = findAllStations(year, month)
     for index, row in stations.iterrows():
         #print(row)
@@ -267,7 +274,7 @@ def stationDistancesMod(year, month):
 
 import numpy as np
 def Availabilityasbinary():
-    
+    """Makes the availability columns binary"""
     for year in os.listdir("finalData"):
         for month in os.listdir(f'finalData/{year}'):
             for station in os.listdir(f'finalData/{year}/{month}'):
@@ -290,7 +297,7 @@ def Availabilityasbinary():
 #Availabilityasbinary()
 
 def addMeanCountLastHour(station, close_stations):
-    
+    """Adds a column with the mean count of the last hour for each station"""
     
     for year in os.listdir("finalData2"):
         for month in os.listdir(f'finalData2/{year}'):
@@ -356,7 +363,7 @@ def addMeanCountLastHour(station, close_stations):
             print(fails)
 
 
-close_stations=stationDistancesMod(2022, 8)
+#close_stations=stationDistancesMod(2022, 8)
 
 
 
@@ -364,6 +371,7 @@ close_stations=stationDistancesMod(2022, 8)
 #addMeanCountLastHour(553, close_stations)
 
 def finalData3to3():
+    """Finds the sum of binary availabilities replaces them with their sum"""
     for year in os.listdir("finalData2"):
         for month in os.listdir(f"finalData2/{year}"):
             for station in os.listdir(f"finalData2/{year}/{month}"):
