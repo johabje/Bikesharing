@@ -106,6 +106,28 @@ def getClusters2(graph, m):
     #return the clusters and the new graph
     return nx.algorithms.community.greedy_modularity_communities(graph, cutoff=m, best_n=m), graph
 
+def getCentroide(nodes):
+    """get the centroide of a list of nodes"""
+    #find the average lat and lon of the nodes
+    lat = 0
+    lon = 0
+    for node in nodes:
+        lat += node[1][0]
+        lon += node[1][1]
+    lat /= len(nodes)
+    lon /= len(nodes)
+    return (lat, lon)
+
+def agglomarativeClustering(graph, m):
+    #reove edges from the graph, until there are m clusters
+    graph_full = graph
+    graph_clustered = nx.create_empty_copy(graph, with_data=True)
+    edges = sorted(graph.edges(data=True), key=lambda x: x[2]["weight"], reverse=False)
+    #list of all nodes in the graph
+    nodes = list(graph.nodes(data=True))
+    #
+    return 
+
 def main():
     graph = getGE()
     #plot the graph using networkx
