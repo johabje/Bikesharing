@@ -77,7 +77,8 @@ def getGE():
         for neighbor in neighbors[:k]:
             graph.add_edge(station, neighbor[0], weight= neighbor[1])
     
-    return graph
+    return graph, simVectors, stations
+
 
 def getClusters(graph, m):
     """get clusters from the graph, until there are m clusters. Returns the clusters and the new graph"""
@@ -106,30 +107,82 @@ def getClusters2(graph, m):
     #return the clusters and the new graph
     return nx.algorithms.community.greedy_modularity_communities(graph, cutoff=m, best_n=m), graph
 
-def getCentroide(nodes):
+def getCentroide(nodes, stations):
     """get the centroide of a list of nodes"""
     #find the average lat and lon of the nodes
+    print("Nodes in getCentroide: ",nodes)
     lat = 0
     lon = 0
     for node in nodes:
-        lat += node[1][0]
-        lon += node[1][1]
+        lat += stations.loc[stations["station_id"] == node]["lat"].item()
+        lon += stations.loc[stations["station_id"] == node]["lon"].item()
     lat /= len(nodes)
     lon /= len(nodes)
-    return (lat, lon)
+    return lat, lon
 
-def agglomarativeClustering(graph, m):
-    #reove edges from the graph, until there are m clusters
-    graph_full = graph
-    graph_clustered = nx.create_empty_copy(graph, with_data=True)
-    edges = sorted(graph.edges(data=True), key=lambda x: x[2]["weight"], reverse=False)
-    #list of all nodes in the graph
-    nodes = list(graph.nodes(data=True))
-    #
-    return 
+def getCenroideVector(nodes, simVectors):
+    """get the centroide vector of a list of nodes"""
+    #find the average vector of the nodes
+    vector = np.zeros(24)
+    for node in nodes:
+        vector += simVectors[node[0]]
+    vector /= len(nodes)
+    return vector
+
+def getCentroideWeigths(stations, simVectors, clusters):
+    weigths =dict()
+    for cluster in cluster:
+        print("cluster: ", cluster)
+        lat, lon = getCentroide(cluster, stations)
+        simVector = getCenroideVector(cluster, simVectors)
+        for station in simVectors:
+            lat2 = stations.loc[stations["station_id"] == station]["lat"].item()
+            lon2 = stations.loc[stations["station_id"] == station]["lon"].item()
+            if station not in cluster:
+                sim = pearsonr(simVector, simVectors[station])
+                dist = haversine((lat, lon), (lat2, lon2))
+                weigths[(cluster, station)] = sim.statistic+math.log10(0.25/dist)
+                print (f'clusterX {cluster} and station {station} have weigth: {weigths[(cluster, station)]}, and distance: {dist}')
+    return weigths
+
+def updateEdges(clusters, stations, simVectors):
+    #create a centroid for each cluster, remove all stations i a cluster from stations and add the centroids to stations
+    print(clusters)
+    for cluster in clusters:
+        print(cluster)
+        print (stations)
+        stations = stations.drop(cluster)
+        weigths = getCentroideWeigths(stations, simVectors)
+        stations.append(cluster)
+    #calculate the weigths between the centroids and the stations in stations list
+    weigths = getCentroideWeigths(stations, simVectors)
+
+
+def agglomarativeClustering(graph, simVectors, stations):
+    graph_full = graph.copy()
+    unconnected_nodes = set(graph_full.nodes())
+    connected_nodes = set()
+    #remove all edges from the graph
+    graph.remove_edges_from(graph.edges())
+    edges = sorted(graph_full.edges(data=True), key=lambda x: x[2]["weight"], reverse=True)
+    #add edges to the graph, until there are m clusters
+    print(edges)
+    while edges[0][2]["weight"] > 0.9:
+        print("hello")
+        graph.add_edge(edges[0][0], edges[0][1], weight= edges[0][2]["weight"])
+        if (edges[0][0] in connected_nodes):
+            connected_nodes.add(edges[0][0])
+        if (edges[0][1] in connected_nodes):
+            connected_nodes.remove(edges[0][1])
+        connected_nodes.add(edges[0][0])
+        connected_nodes.add(edges[0][1])
+        edges.pop(0)
+    #return the clusters and the new graph
+    edges = updateEdges(nx.algorithms.components.connected_components(graph), stations, simVectors)
+    return  nx.algorithms.components.connected_components(graph), graph
 
 def main():
-    graph = getGE()
+    graph, simVectors, stations = getGE()
     #plot the graph using networkx
     options = {
     'node_color': 'black',
@@ -143,7 +196,7 @@ def main():
     plt.show()
 
     m = 200
-    clusters, graph = getClusters2(graph, m)
+    clusters, graph = agglomarativeClustering(graph, stations, simVectors)
     #plot the clusters
     pos=nx.get_node_attributes(graph,'pos')
     ax= nx.draw(graph, pos, **options)
