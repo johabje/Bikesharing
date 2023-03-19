@@ -39,7 +39,7 @@ def getWeigths(stations, simVectors):
             if station1 != station2:
                 sim = pearsonr(simVectors[station1], simVectors[station2])
                 dist = haversine((lat, lon), (lat2, lon2))
-                weigt = sim.statistic+math.log10(0.5/dist)
+                weigt = sim.statistic+math.log10(0.3/dist)
                 #if weigth is larger than the smallest weigth in the list, add it to the list
                 if len(weigthlist) < 3:
                     weigthlist.append((station2, weigt))
@@ -94,7 +94,7 @@ def updateWeigths(clusters, stations, simVectors, stationList):
             newSimVectors[station] = simVectors[station]
     print(NewNodes)
 
-    return getWeigths(NewNodes, newSimVectors)
+    return getWeigths(NewNodes, newSimVectors), NewNodes
         
 
 
@@ -105,43 +105,35 @@ def agglomerativeClustering(weigths, stations, simVectors, stationList):
     clusters = []
     #use the stations with the higest weigth as the first cluster
     maxWeigth = max(weigths, key=weigths.get)
-    while max(weigths.values()) > 0.5:
-        #if both stations are already in a cluster, merge the clusters so they are contained in one cluster
-        found = False
-        for cluster1 in clusters:
-            for cluster2 in clusters:
-                if cluster1 != cluster2 and maxWeigth[0] in cluster1 and maxWeigth[1] in cluster2:
-                    print("merge")
-                    print("before: ", clusters)
-                    cluster = cluster1.union(cluster2)
-                    clusters.append(cluster)
-                    print(clusters)
-                    clusters.remove(cluster2)
-                    clusters.remove(cluster1)
-                    print(clusters)
-                    found = True
-                    break
-            if found:
-                break
+    newNodes = stationList
+    #loop while the higest weigth is larger than 1 and the number of clusters is larger than 175
+    while max(weigths.values()) > 1 and len(newNodes) > 175:
+        #if distance between the two stations is larger than 0.5, go to next biggest weigth
+        #if both stations are clusters, merge the clusters
+        if maxWeigth[0] in range(1,375) and maxWeigth[1] in range(1,375):
+            print("merge")
+            clusters[maxWeigth[0]-1] = clusters[maxWeigth[0]-1].union(clusters[maxWeigth[1]-1])
+            clusters.pop(maxWeigth[1]-1)
+        #if the "station" is actually a cluster, add the other station to the cluster
+        elif maxWeigth[0] in range(1,375):
+            print("add")
+            clusters[maxWeigth[0]-1].add(maxWeigth[1])
+        elif maxWeigth[1] in range(1,375):
+            print("add")
+            clusters[maxWeigth[1]-1].add(maxWeigth[0])
         #if one of the stations in the cluster is already in a cluster, add the connected station to the cluster
-        if not found:
-            for cluster in clusters:
-                print(maxWeigth[0], maxWeigth[1])
-                print(cluster)
-                if maxWeigth[0] in cluster or maxWeigth[1] in cluster:
-                    print("add")
-                    cluster.add(maxWeigth[0])
-                    cluster.add(maxWeigth[1])
-                    break
-            #if both stations are not in a cluster, make a new cluster
-            else:
-                print("new")
-                clusters.append(set(maxWeigth))
+        
+        #if both stations are not in a cluster, make a new cluster
+        else:
+            print("new")
+            clusters.append(set(maxWeigth))
         #get the new set of weigths
-        newweigths = updateWeigths(clusters, stations, simVectors, stationList)
+        print(clusters)
+        newweigths, newNodes = updateWeigths(clusters, stations, simVectors, stationList)
         maxWeigth = max(newweigths, key=newweigths.get)
         print(maxWeigth)
-        print(clusters)
+        weigths = newweigths
+        
     return clusters
 
 

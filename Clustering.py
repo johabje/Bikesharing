@@ -1,6 +1,7 @@
 import pandas as pd
 from FinalDataset import findAllStations
 from scipy.stats.stats import pearsonr
+from scipy.spatial import Voronoi, voronoi_plot_2d
 from haversine import haversine
 import math
 import networkx as nx
@@ -9,6 +10,7 @@ import matplotlib.pyplot as plt
 from contextily import add_basemap
 import networkx as nx
 import numpy as np
+import distinctipy as dp
 import mplleaflet
 #import geopandas
 
@@ -185,7 +187,6 @@ def main():
     graph, simVectors, stations = getGE()
     #plot the graph using networkx
     options = {
-    'node_color': 'black',
     'node_size': 25,
     'width': 1,
     }
@@ -196,13 +197,36 @@ def main():
     plt.show()
 
     m = 200
-    clusters, graph = agglomarativeClustering(graph, stations, simVectors)
+    clusters = [{2347.0, 589.0}, {392, 443}, {401, 423}, {491, 483, 495}, {432, 578, 518}, {441, 452}, {576, 577, 545, 609, 547, 599, 2328, 2330, 478}, {2332, 500, 2334}, {489, 739, 2308, 437}, {618, 619}, {410, 399}, {481, 1101, 414}, {549, 396, 557, 526, 1023}, {434, 502}, {625, 387, 430}, {400, 530, 469, 389, 476}, {627, 572, 559}, {523, 574}, {453, 405}, {480, 522, 381}, {624, 586}, {558, 449, 1755, 2329}, {505, 471}, {550, 462}, {556, 446}, {534, 479}, {617, 421}, {472, 407}, {508, 413, 590}, {435, 748}, {509, 573}, {2280, 623, 390, 615}, {542, 551}, {2339, 475}, {587, 588}, {514, 506}, {442, 597}, {584, 459}, {611, 787, 571}, {620, 622}, {493, 598, 455}, {458, 415}, {431, 406, 487}, {398, 439}, {403, 564}, {408, 377}, {388, 548}, {426, 450, 519}, {496, 580}, {521, 412}, {594, 612}, {626, 746}, {448, 527}, {427, 613}, {537, 2337}, {498, 2270}, {411, 742}] 
+    #change the graph to include the clusters, and the stations in the clusters
+    graph = nx.Graph()
+    colors = dp.get_colors(len(clusters))
+    for index, row in stations.iterrows():
+        for cluster in clusters:
+            if row["station_id"] in cluster:
+                graph.add_node(row["station_id"], pos=(row["lon"],row["lat"]), color= colors[clusters.index(cluster)])
+                print( "station: ", row["station_id"], " is in cluster: ", clusters.index(cluster))
+                break
+        else :
+            graph.add_node(row["station_id"], pos=(row["lon"],row["lat"]), color= (0,0,0))
+            print( "station: ", row["station_id"], " is not in any cluster")
+    
+    colors = [node[1]['color'] for node in graph.nodes(data=True)]
+
     #plot the clusters
     pos=nx.get_node_attributes(graph,'pos')
-    ax= nx.draw(graph, pos, **options)
+    ax= nx.draw(graph, pos, node_color=colors, **options)
     plt.show()
     print("Custers are: ", clusters)
 
+    #create and plot a voronoi diagram with ONE CELL per cluster each cluster
+    vor = Voronoi(stations[["lon", "lat"]].values)
+    #Color the voronoi diagram with the color of the cluster, black if the cell is not in any cluster
+    
+    
+    #plot the voronoi diagram
+    fig = voronoi_plot_2d(vor, show_vertices=False, show_points=True, line_colors='black', line_width=1, line_alpha=0.6, point_size=2)
+    plt.show()
 
     
 main()
