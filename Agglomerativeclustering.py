@@ -39,7 +39,7 @@ def getWeigths(stations, simVectors):
             if station1 != station2:
                 sim = pearsonr(simVectors[station1], simVectors[station2])
                 dist = haversine((lat, lon), (lat2, lon2))
-                weigt = sim.statistic+math.log10(0.3/dist)
+                weigt = sim.statistic+math.log10(0.5/dist)
                 #if weigth is larger than the smallest weigth in the list, add it to the list
                 if len(weigthlist) < 3:
                     weigthlist.append((station2, weigt))
