@@ -7,8 +7,8 @@ import math
 import matplotlib.pyplot as plt
 import pandas as pd
 
-month = "07"
-months = "7"
+month = "06_norm"
+months = "6"
 
 def mean_r2(CO_pred, testY):
     r2s = []

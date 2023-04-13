@@ -30,13 +30,13 @@ def prepTestData(test_data):
 
 def getAreas(month):
     
-    stations=os.listdir(f"Dataset_clusters/{month}")
+    stations=os.listdir(f"Data/Dataset_clusters/{month}")
     
     return stations
 
 
 def getAreaData(area, month):
-    data = pd.read_csv(f"Dataset_clusters/{month}/{area}", index_col=0)
+    data = pd.read_csv(f"Data/Dataset_clusters/{month}/{area}", index_col=0)
     data['count_last_hour'] = data['count_last_hour'].fillna(0)
     return data
 
@@ -94,13 +94,13 @@ def Test_train_month(pred_periods, month):
             #last_pred[station]=prediction[0]
             testX[station]["count_last_hour"][i+1]= prediction[0]
         
-    with open(f'Clustering/results/{month}/CO_RF_pred.json', 'w') as fp:
+    with open(f'Clustering/results/{month}/CO_RF_norm_pred.json', 'w') as fp:
         json.dump(CO_pred, fp)
-    with open(f'Clustering/results/{month}/testY.json', 'w') as fp:
+    with open(f'Clustering/results/{month}/testY_norm.json', 'w') as fp:
         json.dump(testY, fp)
 
 
-months = ["06","07","08"]
+months = ["06_norm"]
 
 for month in months:
     Test_train_month(24, month)
