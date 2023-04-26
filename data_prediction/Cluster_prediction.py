@@ -112,7 +112,9 @@ def Test_train_month(pred_periods, month):
         
     with open(f'Clustering/results/{month}/testY_norm.json', 'w') as fp:
         json.dump(testY, fp)
-
+    
+    
+    
 months = ["06_norm"]
 
 

@@ -43,10 +43,10 @@ def mean_RMSE(CO_pred, testY):
             x=1
     print( f'Mean RMSE is: {sum(r2s) / len(r2s)}')
 
-f = open('results3/CI_pred.json')
-f2 = open('results3/CO_RF_pred.json')
-f3 = open('results3/testY.json')
-f4 = open('results3/CI_true.json')
+f = open('archive/results3/CI_pred.json')
+f2 = open('archive/results3/CO_RF_pred.json')
+f3 = open('archive/results3/testY.json')
+f4 = open('archive/results3/CI_true.json')
 
 #f5 = open('results/CO_RF_pred.json')
 # returns JSON object as 
@@ -115,7 +115,7 @@ plt.ylabel("Number of Check-outs")
 plt.show()
 
 
-df = pd.read_csv("tripdata/2022/08.csv")
+df = pd.read_csv("data/tripdata/2022/08.csv")
 
 top_ten = df['start_station_id'].value_counts()[:10].sort_values(ascending=False)
 b_ten = df['start_station_id'].value_counts().sort_values(ascending=True)[:10]
