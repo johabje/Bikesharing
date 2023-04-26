@@ -3,11 +3,10 @@ import pandas as pd
 import json
 import numpy as np
 
-def trainMA(X_train, Y_train, station, window_size=100):
-    moving_average = Y_train.rolling(window=window_size).mean().iloc[-1]
+def trainEMA(X_train, Y_train, station, alpha=0.1):
+    exp_moving_average = Y_train.ewm(alpha=alpha).mean().iloc[-1]
     print(f"Training for station {station}")
-    return moving_average
-
+    return exp_moving_average
 
 
 
@@ -34,15 +33,15 @@ def getAreaData(area, month):
 
 
 
-def Test_train_month(pred_periods, month, window_size=300):
-    """Implements the moving average prediction model for the given number of periods"""
+def Test_train_month(pred_periods, month, alpha=0.5):
+    """Implements the exponential moving average prediction model for the given number of periods"""
 
     areas = getAreas(month)
     models = dict()
     testX = dict()
     testY = dict()
     CO_pred = dict()
-    
+
     for station in areas:
         print("Now starting station ", station)
         data = getAreaData(station, month)
@@ -61,19 +60,20 @@ def Test_train_month(pred_periods, month, window_size=300):
     
         Y_train = train_data["count"]
 
-        models[station] = trainMA(X_train, Y_train, station, window_size)
+        models[station] = trainEMA(X_train, Y_train, station, alpha)
         print("Area ", areas.index(station), " has been trained")
         
 
     for i in range(0, pred_periods):
         print(i)
         for station in areas:
-            recent_values = testY[station][max(-i-1, -window_size):] + CO_pred[station][max(-window_size+i+1, 0):]
-            moving_average = np.mean(recent_values)
-            CO_pred[station].append(moving_average)
-            
+            # Calculate the Exponential Moving Average for the station
+            recent_values = testY[station][-i-1:] + CO_pred[station][:-1]
+            exp_moving_average = pd.Series(recent_values).ewm(alpha=alpha).mean().iloc[-1]
+            CO_pred[station].append(exp_moving_average)
+
             if i + 1 < pred_periods:
-                testX[station]["count_last_hour"][i + 1] = moving_average
+                testX[station]["count_last_hour"][i + 1] = exp_moving_average
     
             
     with open(f'Clustering/results/{month}/CO_MA_norm_pred.json', 'w') as fp:

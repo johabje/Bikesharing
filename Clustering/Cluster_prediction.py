@@ -7,9 +7,10 @@ def trainRandom(X_train, Y_train, station):
 
     # Create the parameter grid based on the results of random search 
     # Create a based model
-    rf = RandomForestRegressor()
-    # Instantiate the grid search model
     
+    rf = RandomForestRegressor()
+    
+    # Instantiate the grid search model
     
     rf.fit(X_train, Y_train)
 
@@ -17,15 +18,21 @@ def trainRandom(X_train, Y_train, station):
     return rf
 
 def prepTestData(test_data):
-    #print("len before: ", len(test_data))
+    
+    # print("len before: ", len(test_data))
+    
     test_data.reset_index(drop=True,inplace=True)
-    #print("len after: ", len(test_data))
+    
+    # print("len after: ", len(test_data))
+    
     Y_test = test_data["count"]
     X_test = test_data.drop(columns=["count"], inplace=False)
     X_test["count_last_hour"] = None
     X_test["count_last_hour"][0] = 0
-    #X_test["Mean_close_count_last_hour"] = None
-    #X_test["Mean_close_count_last_hour"][0] = 0
+    
+    # X_test["Mean_close_count_last_hour"] = None
+    # X_test["Mean_close_count_last_hour"][0] = 0
+    
     return X_test, Y_test
 
 def getAreas(month):
@@ -33,7 +40,6 @@ def getAreas(month):
     stations=os.listdir(f"Data/Dataset_clusters/{month}")
     
     return stations
-
 
 def getAreaData(area, month):
     data = pd.read_csv(f"Data/Dataset_clusters/{month}/{area}", index_col=0)
@@ -83,27 +89,32 @@ def Test_train_month(pred_periods, month):
     """stations = list(stations_ok)
     probDict = get_probability_dict("2022", "08")
     close_stations=stationDistancesMod(2022, 8, stations)"""
+    
+    
+    
     for i in range(0,pred_periods):
         print(i)
         #1. perdict next row for each station
         #last_pred = dict()
         for station in areas:
+            
             prediction = models[station].predict(testX[station].iloc[[i]])
             #print(testX[station].iloc[[i]])
+            
             CO_pred[station].append(prediction[0])
+            
             #print(prediction[0])
             #last_pred[station]=prediction[0]
-            testX[station]["count_last_hour"][i+1]= prediction[0]
+            testX[station]["count_last_hour"][i+1] = prediction[0]
         
     with open(f'Clustering/results/{month}/CO_RF_norm_pred.json', 'w') as fp:
         json.dump(CO_pred, fp)
+        
     with open(f'Clustering/results/{month}/testY_norm.json', 'w') as fp:
         json.dump(testY, fp)
 
-
 months = ["06_norm"]
+
 
 for month in months:
     Test_train_month(24, month)
-
-

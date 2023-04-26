@@ -44,6 +44,7 @@ def mean_MAE(CO_pred, testY):
     print( f'Mean MAE is: {sum(r2s) / len(r2s)}')
     plt.plot(r2s)
     plt.show()
+    
 def mean_RMSE(CO_pred, testY):
     r2s = []
     for key in CO_pred:
