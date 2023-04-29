@@ -3,14 +3,22 @@ import os
 import pandas as pd
 import json
 
+from sklearn.model_selection import RandomizedSearchCV
+
 def trainRandom(X_train, Y_train, station):
 
     # Create the parameter grid based on the results of random search 
     # Create a based model
     rf = RandomForestRegressor()
     # Instantiate the grid search model
-    
-    
+    random_grid= {'bootstrap': [True, False],
+ 'max_depth': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, None],
+ 'max_features': ['auto', 'sqrt'],
+ 'min_samples_leaf': [1, 2, 4],
+ 'min_samples_split': [2, 5, 10],
+ 'n_estimators': [200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000]}
+    rf_random = RandomizedSearchCV(estimator = rf, param_distributions = random_grid, n_iter = 100, cv = 3, verbose=2, random_state=42, n_jobs = -1)
+
     rf.fit(X_train, Y_train)
 
     print(f"training for station {station}")
@@ -30,13 +38,13 @@ def prepTestData(test_data):
 
 def getAreas(month):
     
-    stations=os.listdir(f"Data/Dataset_clusters/{month}")
+    stations=os.listdir(f"Data/Dataset_clusters/with_avail/{month}")
     
     return stations
 
 
 def getAreaData(area, month):
-    data = pd.read_csv(f"Data/Dataset_clusters/{month}/{area}", index_col=0)
+    data = pd.read_csv(f"Data/Dataset_clusters/with_avail/{month}/{area}", index_col=0)
     data['count_last_hour'] = data['count_last_hour'].fillna(0)
     return data
 
@@ -54,6 +62,7 @@ def Test_train_month(pred_periods, month):
     for station in areas:
         print("now startin station ",station)
         data = getAreaData(station, month)
+
         CO_pred[station] = []
         #CI_pred[station] = []
         #Test Train split

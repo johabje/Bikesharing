@@ -47,8 +47,8 @@ def mean_RMSE(CO_pred, testY):
             x=1
     print( f'Mean RMSE is: {sum(r2s) / len(r2s)}')
 
-f2 = open(f'Clustering/results/{month}/CO_RF_pred.json')
-f3 = open(f'Clustering/results/{month}/testY.json')
+f2 = open(f'Clustering/results/{month}/CO_RF_norm_pred.json')
+f3 = open(f'Clustering/results/{month}/testY_norm.json')
 
 
 #f5 = open('results/CO_RF_pred.json')
