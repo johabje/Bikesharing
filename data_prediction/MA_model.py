@@ -3,10 +3,20 @@ import pandas as pd
 import json
 import numpy as np
 
-def trainMA(X_train, Y_train, station, window_size=100):
-    moving_average = Y_train.rolling(window=window_size).mean().iloc[-1]
-    print(f"Training for station {station}")
-    return moving_average
+def trainMA(X_train, Y_train, station, window_size=3):
+    # Calculate the moving average for the given window size
+    def moving_average(y, window_size):
+        y_np = np.array(y)
+        cumsum = np.cumsum(y_np)
+        cumsum[window_size:] = cumsum[:-window_size] + y_np[window_size:] - y_np[:-window_size]
+        return cumsum[window_size - 1:] / window_size
+
+    # Calculate the moving average of the target variable (Y_train)
+    Y_train_ma = moving_average(Y_train, window_size)
+
+    print(f"training for station {station}")
+    return Y_train_ma
+
 
 
 
@@ -76,9 +86,9 @@ def Test_train_month(pred_periods, month, window_size=300):
                 testX[station]["count_last_hour"][i + 1] = moving_average
     
             
-    with open(f'Clustering/results/{month}/CO_MA_norm_pred.json', 'w') as fp:
+    with open(f'data_prediction/results/{month}/CO_MA_norm_pred.json', 'w') as fp:
         json.dump(CO_pred, fp)
-    with open(f'Clustering/results/{month}/testY_norm.json', 'w') as fp:
+    with open(f'data_prediction/results/{month}/testY_norm.json', 'w') as fp:
         json.dump(testY, fp)
 
 

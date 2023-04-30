@@ -11,8 +11,8 @@ months = "6"
 
 # Other functions remain the same
 
-f2 = open(f'Clustering/results/{month}/CO_MA_norm_pred.json')  # Changed from RF to MA
-f3 = open(f'Clustering/results/{month}/testY_norm.json')  # Changed to testY_norm
+f2 = open(f'data_prediction/results/{month}/CO_MA_norm_pred.json')  # Changed from RF to MA
+f3 = open(f'data_prediction/results/{month}/testY_norm.json')  # Changed to testY_norm
 
 CO_pred = json.load(f2)
 testY = json.load(f3)

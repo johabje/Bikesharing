@@ -19,7 +19,7 @@ def mean_r2(CO_pred, testY):
     r2s.sort()
     r2s.pop(0)
     print( f'Mean r2 is: {sum(r2s) / len(r2s)}')
-    #r2s.remove(-70.05087536729536)
+    # r2s.remove(-70.05087536729536)
     plt.plot(r2s)
     plt.show()
     
@@ -69,6 +69,7 @@ mean_MAE(CI_pred, CI_true)
 print(mean_r2(CI_pred, CI_true))
 mean_RMSE(CI_pred, CI_true)
 print("----------------------------------------")
+
 '''
 print("RF")
 mean_MAE(CO_RF_pred, testY)
