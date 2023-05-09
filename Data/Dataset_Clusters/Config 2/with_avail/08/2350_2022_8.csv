@@ -1,0 +1,2 @@
+Unnamed: 0,Nedbør (1 t),Lufttemperatur,Middelvind,Skydekke,count,weekday,hour,isHoliday,count_last_hour,bike_availability_1,dock_availability_1,bike_availability_2,dock_availability_2,availability,dock_availability
+2022-08-31 15:00:00+00:00,0.0,19.9,2.6,1,12,2,15,False,7.0,0.9808333333333332,0.9808333333333332,0.9808333333333332,0.9808333333333332,0.9808333333333332,0.9808333333333332

@@ -1,7 +1,6 @@
 #get a list of all stations
-from FinalDataset import findAllStations
 import pandas as pd
-from FinalDataset import findAllStations
+from dataPreperation.FinalDataset import findAllStations
 from scipy.stats import pearsonr
 from haversine import haversine
 import math
@@ -39,7 +38,7 @@ def getWeigths(stations, simVectors):
             if station1 != station2:
                 sim = pearsonr(simVectors[station1], simVectors[station2])
                 dist = haversine((lat, lon), (lat2, lon2))
-                weigt = sim.statistic+math.log10(0.5/dist)
+                weigt = sim.statistic+math.log10(0.35/dist)
                 #if weigth is larger than the smallest weigth in the list, add it to the list
                 if len(weigthlist) < 3:
                     weigthlist.append((station2, weigt))
@@ -107,7 +106,7 @@ def agglomerativeClustering(weigths, stations, simVectors, stationList):
     maxWeigth = max(weigths, key=weigths.get)
     newNodes = stationList
     #loop while the higest weigth is larger than 1 and the number of clusters is larger than 175
-    while max(weigths.values()) > 1 and len(newNodes) > 175:
+    while max(weigths.values()) > 1 and len(newNodes) > 150:
         #if distance between the two stations is larger than 0.5, go to next biggest weigth
         #if both stations are clusters, merge the clusters
         if maxWeigth[0] in range(1,375) and maxWeigth[1] in range(1,375):
@@ -144,7 +143,7 @@ def main():
     k=3
     year = 2022
     month = "09"
-    tripData = pd.read_csv(f"tripdata/{year}/{month}.csv")
+    tripData = pd.read_csv(f"Data/tripdata/{year}/{month}.csv")
     tripData["started_at"] = pd.to_datetime(tripData["started_at"])
     tripData["ended_at"] = pd.to_datetime(tripData["ended_at"])
     stations = findAllStations(year, month)

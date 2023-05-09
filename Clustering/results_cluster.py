@@ -7,8 +7,7 @@ import math
 import matplotlib.pyplot as plt
 import pandas as pd
 
-month = "06_norm"
-months = "6"
+
 
 def mean_r2(CO_pred, testY):
     r2s = []
@@ -47,8 +46,12 @@ def mean_RMSE(CO_pred, testY):
             x=1
     print( f'Mean RMSE is: {sum(r2s) / len(r2s)}')
 
-f2 = open(f'Clustering/results/{month}/CO_RF_norm_pred.json')
-f3 = open(f'Clustering/results/{month}/testY_norm.json')
+month = "all"
+months = "9"
+config = "Config 2"
+
+f2 = open(f'Clustering/results/{config}/{month}/CO_RF_pred.json')
+f3 = open(f'Clustering/results/{config}/{month}/testY.json')
 
 
 #f5 = open('results/CO_RF_pred.json')
@@ -86,7 +89,7 @@ print("----------------------------------------")
 '''
 
 
-station_405_pred = CO_pred[f"3_2022_{months}.csv"]
+station_405_pred = CO_pred[f"1_2022_{months}.csv"]
 station_405_true = testY[f"1_2022_{months}.csv"]
 plt.plot(station_405_pred, label="Prediction")
 plt.plot(station_405_true, label="Actual")
@@ -97,8 +100,8 @@ plt.ylabel("Number of Check-outs")
 plt.show()
 
 
-station_405_pred = CO_pred[f"45_2022_{months}.csv"]
-station_405_true = testY[f"45_2022_{months}.csv"]
+station_405_pred = CO_pred[f"30_2022_{months}.csv"]
+station_405_true = testY[f"30_2022_{months}.csv"]
 plt.plot(station_405_pred, label="Prediction")
 plt.plot(station_405_true, label="Actual")
 
@@ -107,8 +110,8 @@ plt.xlabel("Hour")
 plt.ylabel("Number of Check-outs")
 plt.show()
 
-station_405_pred = CO_pred[f"404_2022_{months}.csv"]
-station_405_true = testY[f"404_2022_{months}.csv"]
+station_405_pred = CO_pred[f"787_2022_{months}.csv"]
+station_405_true = testY[f"787_2022_{months}.csv"]
 plt.plot(station_405_pred, label="Prediction")
 plt.plot(station_405_true, label="Actual")
 

@@ -23,7 +23,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 def findAllStations(year, month):
     """Finds all stations in a given month, and returns a dataframe with all stations, and their lat/long"""
     m = str(month)
-    df = pd.read_csv(f"tripdata/{year}/{m.zfill(2)}.csv")
+    df = pd.read_csv(f"Data/tripdata/{year}/{m.zfill(2)}.csv")
     df.drop_duplicates(subset=["start_station_id"],inplace=True)
 
     df.drop(["started_at","ended_at","duration","start_station_name","start_station_description","end_station_id","end_station_name","end_station_description","end_station_latitude","end_station_longitude"], axis = 1, inplace = True)
@@ -187,7 +187,7 @@ def addMonth():
 def findAllStations_in(year, month):
     """Finds all stations in a given month"""
     m = str(month)
-    df = pd.read_csv(f"tripdata/{year}/{m.zfill(2)}.csv")
+    df = pd.read_csv(f"Data/tripdata/{year}/{m.zfill(2)}.csv")
     df.drop_duplicates(subset=["start_station_id"],inplace=True)
 
     df.drop(["started_at","ended_at","duration","start_station_name","start_station_description",
