@@ -1,5 +1,4 @@
 import pandas as pd
-from FinalDataset import findAllStations
 from scipy.stats.stats import pearsonr
 from scipy.spatial import Voronoi, voronoi_plot_2d
 from haversine import haversine
@@ -14,7 +13,16 @@ import distinctipy as dp
 import mplleaflet
 #import geopandas
 
+def findAllStations(year, month):
+    """Finds all stations in a given month, and returns a dataframe with all stations, and their lat/long"""
+    m = str(month)
+    df = pd.read_csv(f"Data/tripdata/{year}/{m.zfill(2)}.csv")
+    df.drop_duplicates(subset=["start_station_id"],inplace=True)
 
+    df.drop(["started_at","ended_at","duration","start_station_name","start_station_description","end_station_id","end_station_name","end_station_description","end_station_latitude","end_station_longitude"], axis = 1, inplace = True)
+    df.rename(columns = {'start_station_id':'station_id', 'start_station_latitude':'lat', "start_station_longitude":"lon"}, inplace = True)
+    #print(df.head(20))
+    return df
 
 
 def simVector(station, tripData):
@@ -51,7 +59,7 @@ def getGE():
     k=3
     year = 2022
     month = "09"
-    tripData = pd.read_csv(f"tripdata/{year}/{month}.csv")
+    tripData = pd.read_csv(f"Data/tripdata/{year}/{month}.csv")
     tripData["started_at"] = pd.to_datetime(tripData["started_at"])
     tripData["ended_at"] = pd.to_datetime(tripData["ended_at"])
     stations = findAllStations(year, month)
@@ -197,9 +205,9 @@ def main():
     plt.show()
 
     m = 200
-    clusters = [{2347.0, 589.0}, {392, 443}, {401, 423}, {491, 483, 495}, {432, 578, 518}, {441, 452}, {576, 577, 545, 609, 547, 599, 2328, 2330, 478}, {2332, 500, 2334}, {489, 739, 2308, 437}, {618, 619}, {410, 399}, {481, 1101, 414}, {549, 396, 557, 526, 1023}, {434, 502}, {625, 387, 430}, {400, 530, 469, 389, 476}, {627, 572, 559}, {523, 574}, {453, 405}, {480, 522, 381}, {624, 586}, {558, 449, 1755, 2329}, {505, 471}, {550, 462}, {556, 446}, {534, 479}, {617, 421}, {472, 407}, {508, 413, 590}, {435, 748}, {509, 573}, {2280, 623, 390, 615}, {542, 551}, {2339, 475}, {587, 588}, {514, 506}, {442, 597}, {584, 459}, {611, 787, 571}, {620, 622}, {493, 598, 455}, {458, 415}, {431, 406, 487}, {398, 439}, {403, 564}, {408, 377}, {388, 548}, {426, 450, 519}, {496, 580}, {521, 412}, {594, 612}, {626, 746}, {448, 527}, {427, 613}, {537, 2337}, {498, 2270}, {411, 742}] 
-    #change the graph to include the clusters, and the stations in the clusters
-    graph = nx.Graph()
+    clusters = [{2347.0, 589.0}, {392, 443}, {401, 507, 423}, {491, 483, 495}, {432, 578, 518}, {441, 452}, {576, 577, 545, 609, 547, 448, 527, 599, 2328, 2330, 478}, {2332, 500, 2334}, {489, 739, 2308, 437}, {474, 618, 619}, {410, 399}, {481, 1101, 414}, {549, 396, 557, 526, 1023}, {434, 502}, {625, 387, 430}, {400, 530, 469, 389, 476}, {627, 572, 445, 559}, {523, 574}, {453, 405}, {480, 522, 381}, {624, 586}, {558, 449, 1755, 2329}, {505, 471}, {550, 462}, {620, 622, 556, 446}, {534, 479}, {617, 421}, {472, 407}, {508, 413, 590}, {568, 435, 748}, {509, 573}, {2280, 623, 390, 615}, {542, 551}, {2339, 475}, {388, 587, 588, 548}, {514, 506}, {442, 597}, {584, 473, 459}, {611, 787, 571}, {493, 598, 455}, {458, 415}, {431, 406, 487}, {398, 439}, {403, 564, 535}, {408, 377}, {426, 450, 519}, {496, 580}, {521, 385, 412}, {594, 612}, {626, 746}, {427, 613}, {537, 2337}, {498, 2270}, {411, 742}, {484, 429}, {488, 540}, {404, 511}, {744, 607}, {600, 735}, {970, 460}, {581, 583}, {608, 433}, {616, 541}, {425, 596, 382}]     #change the graph to include the clusters, and the stations in the clusters
+    
+    dgraph = nx.Graph()
     colors = dp.get_colors(len(clusters))
     for index, row in stations.iterrows():
         for cluster in clusters:
