@@ -58,7 +58,7 @@ def getAreaData(area, months):
         data = data.append(month_data)
         #drop all rows with NaN
         data = data.dropna()
-        data = data.iloc[:-1]
+        data = data.iloc[:-24*7]
     return data
 
 
