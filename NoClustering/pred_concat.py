@@ -36,32 +36,36 @@ def prepTestData(test_data):
     #X_test["Mean_close_count_last_hour"][0] = 0
     return X_test, Y_test
 
-def getAreas(month, config):
-    
-    stations=os.listdir(f"Data/Dataset_clusters/{config}/with_avail/{month[-1]}")
-    
+def getAreas(month):
+    print(month[-1])
+
+    stations=os.listdir(f"Data/Dataset_NoClusters/with_avail/{month[-1]}")
+    print(stations)
     return stations
 
-
-def getAreaData(area, months, config):
+def getAreaData(area, months):
     data = pd.DataFrame()
     for month in months:
         try:
-            month_data = pd.read_csv(f"Data/Dataset_clusters/{config}/with_avail/{month}/{area[:-5]}{month[-1]}.csv", index_col=0)
+            month_data = pd.read_csv(f"Data/Dataset_NoClusters/with_avail/{month}/{area}", index_col=0)
+            #drop all colums named something with dock
+            month_data = month_data.drop(columns=[col for col in month_data.columns if 'dock' in col])
         except:
             continue
+        print(month_data.info())
+        print(data.info())
         month_data['count_last_hour'] = month_data['count_last_hour'].fillna(0)
         data = data.append(month_data)
         #drop all rows with NaN
         data = data.dropna()
-        data = data.iloc[:-24*6]
+        data = data.iloc[:-24*7]
     return data
 
 
-def Test_train_month(pred_periods, months, config):
+def Test_train_month(pred_periods, months):
     """Implements the random prediction model for the given number of periods"""
 
-    areas = getAreas(months, config)
+    areas = getAreas(months)
     models = dict()
     testX = dict()
     testY = dict()
@@ -70,7 +74,7 @@ def Test_train_month(pred_periods, months, config):
     #print(getAllData(606).fillna(0))
     for station in areas:
         print("now startin station ",station)
-        data = getAreaData(station, months, config)
+        data = getAreaData(station, months)
 
         CO_pred[station] = []
         #CI_pred[station] = []
@@ -112,13 +116,13 @@ def Test_train_month(pred_periods, months, config):
             #last_pred[station]=prediction[0]
             testX[station]["count_last_hour"][i+1]= prediction[0]
         
-    with open(f'Clustering/results/{config}/all/CO_RF_pred.json', 'w') as fp:
+    with open(f'NoClustering/results/with_avail/all/CO_RF_pred.json', 'w') as fp:
         json.dump(CO_pred, fp)
-    with open(f'Clustering/results/{config}/all/testY.json', 'w') as fp:
+    with open(f'NoClustering/results/with_avail/all/testY.json', 'w') as fp:
         json.dump(testY, fp)
 
 
 months = ["06", "07", "08", "09"]
 
 
-Test_train_month(24, months, "Config 2")
+Test_train_month(24, months)

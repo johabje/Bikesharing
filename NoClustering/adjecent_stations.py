@@ -44,4 +44,4 @@ def createStationDatasets(year, month, max_distance):
         
         station_data.to_csv(f"Data/Dataset_NoClusters/with_avail/{month}/{target_station}.csv", index=False)
         
-createStationDatasets(2022, "06", 0.5)
+createStationDatasets(2022, "09", 0.15)

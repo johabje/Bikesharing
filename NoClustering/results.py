@@ -50,8 +50,8 @@ month = "all"
 months = "9"
 config = "Config 2"
 
-f2 = open(f'Clustering/results/{config}/{month}/CO_RF_pred.json')
-f3 = open(f'Clustering/results/{config}/{month}/testY.json')
+f2 = open(f'NoClustering/results/no_avail/{month}/CO_RF_pred.json')
+f3 = open(f'NoClustering/results/no_avail/{month}/testY.json')
 
 
 #f5 = open('results/CO_RF_pred.json')
@@ -88,9 +88,13 @@ mean_RMSE(CI_RF_pred, CI_true)
 print("----------------------------------------")
 '''
 
+station1 = "463.0.csv"
+station2 = "468.0.csv"
+station3 = "460.0.csv"
 
-station_405_pred = CO_pred[f"377_2022_{months}.csv"]
-station_405_true = testY[f"377_2022_{months}.csv"]
+
+station_405_pred = CO_pred[station1]
+station_405_true = testY[station1]
 plt.plot(station_405_pred, label="Prediction")
 plt.plot(station_405_true, label="Actual")
 
@@ -100,8 +104,8 @@ plt.ylabel("Number of Check-outs")
 plt.show()
 
 
-station_405_pred = CO_pred[f"445_2022_{months}.csv"]
-station_405_true = testY[f"445_2022_{months}.csv"]
+station_405_pred = CO_pred[station2]
+station_405_true = testY[station2]
 plt.plot(station_405_pred, label="Prediction")
 plt.plot(station_405_true, label="Actual")
 
@@ -110,8 +114,8 @@ plt.xlabel("Hour")
 plt.ylabel("Number of Check-outs")
 plt.show()
 
-station_405_pred = CO_pred[f"787_2022_{months}.csv"]
-station_405_true = testY[f"787_2022_{months}.csv"]
+station_405_pred = CO_pred[station3]
+station_405_true = testY[station3]
 plt.plot(station_405_pred, label="Prediction")
 plt.plot(station_405_true, label="Actual")
 
