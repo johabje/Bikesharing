@@ -50,8 +50,8 @@ month = "all"
 months = "9"
 config = "Config 2"
 
-f2 = open(f'Clustering/results/{config}/{month}/CO_RF_pred.json')
-f3 = open(f'Clustering/results/{config}/{month}/testY.json')
+f2 = open(f'NoClustering/results/with_avail/{month}/CO_RF_pred.json')
+f3 = open(f'NoClustering/results/with_avail/{month}/testY.json')
 
 
 #f5 = open('results/CO_RF_pred.json')
