@@ -69,7 +69,7 @@ def Test_train_month(pred_periods, months, config):
     CI_pred = dict()
     #print(getAllData(606).fillna(0))
     for station in areas:
-        print("now startin station ",station)
+        print("Now starting station ",station)
         data = getAreaData(station, months, config)
 
         CO_pred[station] = []

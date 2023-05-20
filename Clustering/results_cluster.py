@@ -7,7 +7,8 @@ import math
 import matplotlib.pyplot as plt
 import pandas as pd
 
-
+month = "06"
+months = "6"
 
 def mean_r2(CO_pred, testY):
     r2s = []
@@ -15,15 +16,14 @@ def mean_r2(CO_pred, testY):
         try:
             r2s.append(r2_score(testY[key], CO_pred[key]))
         except:
-            #print('no prediction for ' ,key)
+            # print('no prediction for ' ,key)
             x=1
     r2s.sort()
     r2s.pop(0)
     print( f'Mean r2 is: {sum(r2s) / len(r2s)}')
-    #r2s.remove(-70.05087536729536)
-    plt.plot(r2s)
-    plt.show()
-    
+    # r2s.remove(-70.05087536729536)
+    # plt.plot(r2s)
+    # plt.show()
 
 def mean_MAE(CO_pred, testY):
     r2s = []
@@ -34,8 +34,9 @@ def mean_MAE(CO_pred, testY):
             #print('no prediction for ' ,key)
             x=1
     print( f'Mean MAE is: {sum(r2s) / len(r2s)}')
-    plt.plot(r2s)
-    plt.show()
+    # plt.plot(r2s)
+    # plt.show()
+    
 def mean_RMSE(CO_pred, testY):
     r2s = []
     for key in CO_pred:
@@ -46,15 +47,10 @@ def mean_RMSE(CO_pred, testY):
             x=1
     print( f'Mean RMSE is: {sum(r2s) / len(r2s)}')
 
-month = "all"
-months = "9"
-config = "Config 2"
+f2 = open(f'Clustering/results/Config 2/{month}/CO_RF_pred.json')
+f3 = open(f'Clustering/results/Config 2/{month}/testY.json')
 
-f2 = open(f'Clustering/results/{config}/{month}/CO_RF_pred.json')
-f3 = open(f'Clustering/results/{config}/{month}/testY.json')
-
-
-#f5 = open('results/CO_RF_pred.json')
+# f5 = open('results/CO_RF_pred.json')
 # returns JSON object as 
 # a dictionary
 
@@ -88,35 +84,32 @@ mean_RMSE(CI_RF_pred, CI_true)
 print("----------------------------------------")
 '''
 
+# station_405_pred = CO_pred[f"3_2022_{months}.csv"]
+# station_405_true = testY[f"1_2022_{months}.csv"]
+# plt.plot(station_405_pred, label="Prediction")
+# plt.plot(station_405_true, label="Actual")
 
-station_405_pred = CO_pred[f"1_2022_{months}.csv"]
-station_405_true = testY[f"1_2022_{months}.csv"]
-plt.plot(station_405_pred, label="Prediction")
-plt.plot(station_405_true, label="Actual")
+# plt.legend()
+# plt.xlabel("Hour")
+# plt.ylabel("Number of Check-outs")
+# plt.show()
 
-plt.legend()
-plt.xlabel("Hour")
-plt.ylabel("Number of Check-outs")
-plt.show()
+# station_405_pred = CO_pred[f"35_2022_{months}.csv"]
+# station_405_true = testY[f"35_2022_{months}.csv"]
+# plt.plot(station_405_pred, label="Prediction")
+# plt.plot(station_405_true, label="Actual")
 
+# plt.legend()
+# plt.xlabel("Hour")
+# plt.ylabel("Number of Check-outs")
+# plt.show()
 
-station_405_pred = CO_pred[f"30_2022_{months}.csv"]
-station_405_true = testY[f"30_2022_{months}.csv"]
-plt.plot(station_405_pred, label="Prediction")
-plt.plot(station_405_true, label="Actual")
+# station_405_pred = CO_pred[f"404_2022_{months}.csv"]
+# station_405_true = testY[f"404_2022_{months}.csv"]
+# plt.plot(station_405_pred, label="Prediction")
+# plt.plot(station_405_true, label="Actual")
 
-plt.legend()
-plt.xlabel("Hour")
-plt.ylabel("Number of Check-outs")
-plt.show()
-
-station_405_pred = CO_pred[f"787_2022_{months}.csv"]
-station_405_true = testY[f"787_2022_{months}.csv"]
-plt.plot(station_405_pred, label="Prediction")
-plt.plot(station_405_true, label="Actual")
-
-plt.legend()
-plt.xlabel("Hour")
-plt.ylabel("Number of Check-outs")
-plt.show()
-
+# plt.legend()
+# plt.xlabel("Hour")
+# plt.ylabel("Number of Check-outs")
+# plt.show()
