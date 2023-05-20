@@ -50,8 +50,8 @@ month = "all"
 months = "9"
 config = "Config 2"
 
-f2 = open(f'NoClustering/results/no_avail/{month}/CO_RF_pred.json')
-f3 = open(f'NoClustering/results/no_avail/{month}/testY.json')
+f2 = open(f'NoClustering/results/with_avail/{month}/CO_RF_pred.json')
+f3 = open(f'NoClustering/results/with_avail/{month}/testY.json')
 
 
 #f5 = open('results/CO_RF_pred.json')
@@ -88,9 +88,9 @@ mean_RMSE(CI_RF_pred, CI_true)
 print("----------------------------------------")
 '''
 
-station1 = "463.0.csv"
-station2 = "468.0.csv"
-station3 = "460.0.csv"
+station1 = "460.0.csv"
+station2 = "1009.0.csv"
+station3 = "1023.0.csv"
 
 
 station_405_pred = CO_pred[station1]

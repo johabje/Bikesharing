@@ -1,3 +1,4 @@
+from matplotlib import pyplot as plt
 from sklearn.ensemble import RandomForestRegressor
 import os
 import pandas as pd
@@ -61,6 +62,11 @@ def getAreaData(area, months):
         data = data.iloc[:-24*7]
     return data
 
+def getFeatureImportance(station, model, X):
+    importances = model.feature_importances_
+    colums = list(X.columns)
+    plt.barh(colums, importances)
+    plt.show()
 
 def Test_train_month(pred_periods, months):
     """Implements the random prediction model for the given number of periods"""
@@ -99,7 +105,9 @@ def Test_train_month(pred_periods, months):
         #train model
         models[station] = trainRandom(X_train,Y_train, station)
         print("Area ", areas.index(station), " has been trained")
-        
+        if station == "460.0.csv" or station == "1023.0.csv":
+            print("Feature importance for station ", station, ":")
+            getFeatureImportance(station, models[station], X_train)
 
     """stations = list(stations_ok)
     probDict = get_probability_dict("2022", "08")

@@ -121,4 +121,4 @@ def Test_train_month(pred_periods, months, config):
 months = ["06", "07", "08", "09"]
 
 
-Test_train_month(24, months, "Config 2")
+Test_train_month(24, months, "Config 3")

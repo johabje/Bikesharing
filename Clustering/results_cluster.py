@@ -48,7 +48,7 @@ def mean_RMSE(CO_pred, testY):
 
 month = "all"
 months = "9"
-config = "Config 2"
+config = "Config 3"
 
 f2 = open(f'Clustering/results/{config}/{month}/CO_RF_pred.json')
 f3 = open(f'Clustering/results/{config}/{month}/testY.json')
