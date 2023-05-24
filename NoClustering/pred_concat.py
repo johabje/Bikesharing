@@ -53,8 +53,8 @@ def getAreaData(area, months):
             month_data = month_data.drop(columns=[col for col in month_data.columns if 'dock' in col])
         except:
             continue
-        print(month_data.info())
-        print(data.info())
+        #print(month_data.info())
+        #print(data.info())
         month_data['count_last_hour'] = month_data['count_last_hour'].fillna(0)
         data = data.append(month_data)
         #drop all rows with NaN
@@ -89,12 +89,12 @@ def Test_train_month(pred_periods, months):
         #print(data["Mean_close_count_last_hour"].head(2))
         test_data = data.iloc[-pred_periods:,:]
         
-        print(test_data)
+        #print(test_data)
         #store test Data
         X_test, Y_test = prepTestData(test_data)
         testX[station], testY[station] = X_test, list(Y_test)
-        print(X_test)
-        print(X_test.info())
+        #print(X_test)
+        #print(X_test.info())
 
         train_data = data.head(-(pred_periods-1))
         X_train = train_data.drop(columns=["count" ], inplace=False)
@@ -130,7 +130,7 @@ def Test_train_month(pred_periods, months):
         json.dump(testY, fp)
 
 
-months = ["06", "07", "08", "09"]
+months = ["04","05","06", "07", "08", "09"]
 
 
 Test_train_month(24, months)

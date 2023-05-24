@@ -9,37 +9,32 @@ station_1_id = 2330
 station_2_id = 666
 def getAllData(station):
     station_df = pd.DataFrame()
-    years = os.listdir("finalData3")
+    months = os.listdir("Data/Dataset_NoClusters/with_avail")
     #print(years)
-    years.sort()
-    for year in years:
-        months = os.listdir(f'finalData3/{year}')
-        months.sort()
         #if year =="2022":
          #  months.remove("10")
           # months.remove("9")
            #months.remove("8")
            #months.remove("7")
            #months.remove("6")
-        for month in months:
-
-            try:
-                df_temp = pd.read_csv(f'finalData3/{year}/{month}/{station}.csv')
-            except:
-                #print(f"No Records for {year}/{month}")
-                continue
-            station_df=pd.concat([station_df, df_temp], ignore_index=True)
+    for month in months:
+        try:
+          
+            print(f'Data/Dataset_NoClusters/with_avail/{month}/{station}_2022_{month[-1]}.csv')
+            df_temp = pd.read_csv(f'Data/Dataset_NoClusters/with_avail/{month}/{station}.0.csv')
+            print(df_temp)
+        except:
+            print(f"No Records for {month}")
+            continue
+        station_df=pd.concat([station_df, df_temp], ignore_index=True)
     #station_df.rename(columns = {'count':'malvar'}, inplace = True)
     #print(station_df["dateTime"])
-    try:
-        station_df.drop(columns=["dateTime"], inplace=True)   
-    except:
-        return pd.DataFrame()
+   
     return station_df
 
 
 df_2330 =getAllData(2330)
-df_405 = getAllData(505)
+df_405 = getAllData(405)
 #print(df_2330["vind"])
 #avrage demand by day
 def meanPerhour():
@@ -91,14 +86,14 @@ def ridesPerMonth():
     plt.subplot(1, 2, 1)
     df_2330.groupby(pd.cut(df_2330.month, 12)).malvar.mean().plot.bar(ylabel='Mean Check-outs per hour')
 
-    plt.title("station 2330")
+    plt.title("station 1023")
     ax = plt.gca()
     ax.set_xticklabels(labels)
 
     plt.subplot(1, 2, 2)
     df_405.groupby(pd.cut(df_405.month, 12)).malvar.mean().plot.bar(ylabel='Mean Check-outs per hour')
 
-    plt.title("station 405")
+    plt.title("station 460")
     ax = plt.gca()
     ax.set_xticklabels(labels)
     plt.show()
@@ -140,11 +135,11 @@ def ridesPerTemp():
 
 def correlations():
     
-    df_2330.rename(columns = {'malvar':'count'}, inplace = True)
-    df_2330.rename(columns = {'nedør':'precipitation', 'vind':'wind'}, inplace = True)
-
+    df_2330.rename(columns = {'Nedbør (1 t)':'precipitation', 'Middelvind':'wind', "Lufttemperatur":"temprature", "Skydekke": "cloud_cover"}, inplace = True)
+    print(df_2330.info())
     first_column = df_2330.pop('count')
     df_2330.insert(0, 'count', first_column)
+    df_2330.drop(columns=["dock_availability_1", "dock_availability_2"], inplace=True)
     corr2330 = df_2330.corr()
     
     sns.heatmap(corr2330, xticklabels= True, yticklabels= True, vmin=-1, vmax=1, cmap='BrBG')
@@ -152,10 +147,12 @@ def correlations():
     plt.title("Correlation matrix station 2330")
     plt.show()
 
-    df_405.rename(columns = {'malvar':'count', 'vind':'wind','nedør':'precipitation'}, inplace = True)
+    df_405.rename(columns = {'Nedbør (1 t)':'precipitation', 'Middelvind':'wind', "Lufttemperatur":"temprature", "Skydekke": "cloud_cover"}, inplace = True)
+    
     print(df_405.info())
     first_column = df_405.pop('count')
     df_405.insert(0, 'count', first_column)
+    df_405.drop(columns=["dock_availability_1"], inplace=True)
     corr405 = df_405.corr()
     print(corr405)
     sns.heatmap(corr405, xticklabels= True, yticklabels= True, vmin=-1, vmax=1, cmap='BrBG')
@@ -166,9 +163,9 @@ correlations()
 import math
 def meanCountperHour():
     mean_counts = []
-    for station in os.listdir("finalData3/2022/10"):
+    for station in os.listdir("Data/Dataset_NoClusters/09"):
         
-        df=pd.read_csv(f"finalData3/2022/10/{station}")
+        df=pd.read_csv(f"fData/Dataset_NoClusters/09/{station}")
         mean_counts.append(df['count'].std())
     
     plt.hist(mean_counts, bins=60)

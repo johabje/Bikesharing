@@ -19,6 +19,7 @@ def getStationCounts(stations, tripData, startTime, endTime):
     for station in stations:
         #slice the dataframe such that it only contains the station
         tripDatastation = tripData[tripData["start_station_id"] == station]
+        #print(tripDatastation)
         tripDatastationDayHour = tripDatastation.groupby(pd.Grouper(freq='60Min')).count()
         tripDatastationDayHour.drop(columns=["start_station_id"], inplace=True)
 
@@ -55,7 +56,7 @@ def getStationCounts(stations, tripData, startTime, endTime):
 
 
 #create a new dataframe with the sum of
-def getClusterCounts(clusters, counts):
+def getClusterCounts(clusters, counts, startTime, endTime):
     """Returns a dictionary with the hourly checkoutcount for each cluster"""
     i=0
     for cluster in clusters:
@@ -77,12 +78,12 @@ def getClusterCounts(clusters, counts):
                     counts.pop(station)
                 except:
                     print(f"station {station} not in counts")
-                    print("did the werid thing")
+                    #print("did the werid thing")
         #if the dataframe is still empty, fill it with zeros
         if df.size == 0:
             df = pd.DataFrame(0, index=pd.date_range(start=startTime, end=endTime, freq="H"), columns=["count"])
-            print(df)
-            print("did Zeros fill")
+            #print(df)
+            #print("did Zeros fill")
             df.index = pd.to_datetime(df.index)
         counts[i] = [df, cluster]
     return counts
@@ -106,8 +107,10 @@ def AddWeatherData(counts):
     for station in counts:
         try:
             counts[station][0] = pd.concat([weather, counts[station][0]], axis=1, join="inner")
+ 
         except:
             counts[station] = [pd.concat([weather, counts[station]], axis=1, join="inner"), [station]]
+
     return counts
 
 def stationDistances(year, month, stations):
@@ -116,7 +119,7 @@ def stationDistances(year, month, stations):
     stations_dist = dict()
     #dict with stations, containig all stations within 500 meters, shuld be sorted by distance
     for index, row in stations.iterrows():
-        #print(row)
+        ##print(row)
         lat = row["lat"]
         lon = row["lon"]
         id = row["station_id"]
@@ -130,24 +133,34 @@ def stationDistances(year, month, stations):
         stations_dist[id] = close_stations
     return stations_dist, stations["station_id"]
 
+def getAllStations(month):
+    tripdata = pd.read_csv(f"Data/tripdata/2022/{month}.csv", parse_dates=True)
+    tripdata["started_at"] = pd.to_datetime(tripdata["started_at"])
+    #print(587 in tripdata['start_station_id'].values)
+    tripdata["count"] = 1
+    tripdata.drop(columns=["ended_at", "start_station_name", "end_station_id", "end_station_name", "start_station_description","end_station_description","duration", "started_at","end_station_latitude", "end_station_longitude" ], inplace=True)
+    #find each unique start station and its latitude and longitude
+    start_stations = tripdata.drop_duplicates('start_station_id', keep='first')
+    
+    return start_stations
 
-
-def main(tripdata, clusters, startTime, endTime):
+def main(tripdata, clusters, startTime, endTime, monthint, monthstr, config):
     #find all unique stations in tripdata, as a list of integers
-    stations = tripdata["start_station_id"].unique()
-    print(stations)
+    stations = list(getAllStations(monthstr)["start_station_id"])
+    
     stations = [int(station) for station in stations]
-    print(stations)
+
     counts = getStationCounts(stations, tripdata, startTime, endTime)
-    counts = getClusterCounts(clusters, counts)
+    counts = getClusterCounts(clusters, counts, startTime, endTime)
     counts = AddWeatherData(counts)
     for station in counts:
         df = counts[station][0]
         #add weekday binary to each record
-        print(type(df.index))
+       
         if type(df.index) == pd.core.indexes.base.Index:
-            print(df)
-            print(counts[station])
+            #print("index is not datetimeindex")
+            #print(counts[station])
+            continue
         df["weekday"] = df.index.dayofweek
         #add hour of day to each record
         df["hour"] = df.index.hour
@@ -160,22 +173,28 @@ def main(tripdata, clusters, startTime, endTime):
         # how do we define closest station or cluster to each station/cluster? mayby borders along a voronoi diagram? most close stations will be in the same cluster
 
         
-        
+    #create output folder if it does not exist
+    if not os.path.exists(f"Data/Dataset_Clusters/{config}/{monthstr}/"):
+        os.makedirs(f"Data/Dataset_Clusters/{config}/{monthstr}/")
     #save counts to file
     for station in counts:
-        counts[station][0].to_csv(f'Data/Dataset_Clusters/Config 2/09/{station}_{startTime.year}_{startTime.month}.csv', index=True)
+        counts[station][0].to_csv(f'Data/Dataset_Clusters/{config}/{monthstr}/{station}_{startTime.year}_{startTime.month}.csv', index=True)
     return counts, stations
 
 
-startTime = dt.datetime(2022, 9, 1, 0, 0, 0)
-endTime = dt.datetime(2022, 9, 30, 23, 0, 0)
+def createDataset(monthint, monthstr, config, clusters):
+    #create output folder if it does not exist
+    if not os.path.exists(f"Data/Dataset_Clusters/{config}/{monthstr}/"):
+        os.makedirs(f"Data/Dataset_Clusters/{config}/{monthstr}/")
+    
+    startTime = dt.datetime(2022, monthint, 1, 0, 0, 0)
+    endTime = dt.datetime(2022, monthint, 30, 23, 0, 0)
+    tripdata = pd.read_csv(f"Data/tripdata/2022/{monthstr}.csv", parse_dates=True)
+    tripdata["started_at"] = pd.to_datetime(tripdata["started_at"])
+    tripdata["count"] = 1
+    tripdata.drop(columns=["ended_at", "start_station_name", "end_station_id", "end_station_name", "start_station_description","end_station_description","duration", "start_station_latitude" , "start_station_longitude",  "end_station_latitude",  "end_station_longitude" ], inplace=True)
+    tripdata.set_index('started_at', inplace=True)
+    counts, stations = main(tripdata, clusters, startTime, endTime, monthint, monthstr, config)
 
-clusters =  [{2347.0, 589.0}, {392, 443}, {401, 423}, {491, 495}, {432, 518}, {441, 452}, {577, 545}, {576, 609, 547, 599}, {2332, 500, 2334}, {489, 739, 437}, {618, 619}, {410, 399}, {481, 1101, 414}, {557, 526, 1023}, {434, 502}, {625, 387, 430}, {400, 530, 469, 389, 476}, {627, 572}, {523, 574}, {453, 405}, {522, 381}, {624, 586}, {449, 2329}, {2328, 2330}, {505, 471}, {550, 462}, {556, 446}, {534, 479}, {617, 421}, {472, 407}, {508, 590}, {435, 748}, {509, 573}, {2280, 623, 390, 615}, {542, 551}, {2339, 475}, {587, 588}, {396, 549}]
-
-tripdata = pd.read_csv("Data/tripdata/2022/09.csv", parse_dates=True)
-tripdata["started_at"] = pd.to_datetime(tripdata["started_at"])
-tripdata["count"] = 1
-tripdata.drop(columns=["ended_at", "start_station_name", "end_station_id", "end_station_name", "start_station_description","end_station_description","duration", "start_station_latitude" , "start_station_longitude",  "end_station_latitude",  "end_station_longitude" ], inplace=True)
-tripdata.set_index('started_at', inplace=True)
-counts, stations = main(tripdata, clusters, startTime, endTime)
-
+#test 
+#createDataset(6, "06", "test", [{2347.0, 589.0}, {392, 443}, {401, 423}, {491, 483, 495}, {432, 578, 518}, {441, 452}, {576, 577, 545, 609, 547, 599, 2328, 2330, 478}, {2332, 500, 2334}, {489, 739, 2308, 437}, {618, 619}, {410, 399}, {481, 1101, 414}, {549, 396, 557, 526, 1023}, {434, 502}, {625, 387, 430}, {400, 530, 469, 389, 476}, {627, 572, 559}, {523, 574}, {453, 405}, {480, 522, 381}, {624, 586}, {558, 449, 1755, 2329}, {505, 471}, {550, 462}, {556, 446}, {534, 479}, {617, 421}, {472, 407}, {508, 413, 590}, {435, 748}, {509, 573}, {2280, 623, 390, 615}, {542, 551}, {2339, 475}, {587, 588}, {514, 506}, {442, 597}, {584, 459}, {611, 787, 571}, {620, 622}, {493, 598, 455}, {458, 415}, {431, 406, 487}, {398, 439}, {403, 564}, {408, 377}, {388, 548}, {426, 450, 519}, {496, 580}, {521, 412}, {594, 612}, {626, 746}, {448, 527}, {427, 613}, {537, 2337}, {498, 2270}, {411, 742}])

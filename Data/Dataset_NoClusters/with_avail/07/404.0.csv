@@ -1,4 +1,4 @@
-Unnamed: 0,Nedbør (1 t),Lufttemperatur,Middelvind,Skydekke,count,weekday,hour,isHoliday,count_last_hour,bike_availability_1,dock_availability_1
+Unnamed: 0,Nedbør (1 t),Lufttemperatur,Middelvind,Skydekke,count,weekday,hour,isHoliday,count_last_hour,bike_availability_511.0,dock_availability_511.0
 2022-07-01 00:00:00+00:00,0.0,-7.1,2.2,5,0,4,0,False,,0.999722222222222,0.999722222222222
 2022-07-01 01:00:00+00:00,0.0,-8.1,0.4,5,0,4,1,False,0.0,0.9627777777777776,0.9627777777777776
 2022-07-01 02:00:00+00:00,0.0,-7.9,2.4,5,0,4,2,False,0.0,0.9991666666666668,0.9991666666666668

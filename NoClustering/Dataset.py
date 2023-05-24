@@ -162,15 +162,15 @@ def main(tripdata, startTime, endTime):
         
     #save counts to file
     for station in counts:
-        counts[station][0].to_csv(f'Data/Dataset_NoClusters/06/{station}_{startTime.year}_{startTime.month}.csv', index=True)
+        counts[station][0].to_csv(f'Data/Dataset_NoClusters/04/{station}_{startTime.year}_{startTime.month}.csv', index=True)
     return counts, stations
 
 
-startTime = dt.datetime(2022, 6, 1, 0, 0, 0)
-endTime = dt.datetime(2022, 6, 30, 23, 0, 0)
+startTime = dt.datetime(2022, 4, 1, 0, 0, 0)
+endTime = dt.datetime(2022, 4, 30, 23, 0, 0)
 
 
-tripdata = pd.read_csv("Data/tripdata/2022/06.csv", parse_dates=True)
+tripdata = pd.read_csv("Data/tripdata/2022/04.csv", parse_dates=True)
 tripdata["started_at"] = pd.to_datetime(tripdata["started_at"])
 tripdata["count"] = 1
 tripdata.drop(columns=["ended_at", "start_station_name", "end_station_id", "end_station_name", "start_station_description","end_station_description","duration", "start_station_latitude" , "start_station_longitude",  "end_station_latitude",  "end_station_longitude" ], inplace=True)

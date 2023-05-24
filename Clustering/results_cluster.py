@@ -45,10 +45,10 @@ def mean_RMSE(CO_pred, testY):
             #print('no prediction for ' ,key)
             x=1
     print( f'Mean RMSE is: {sum(r2s) / len(r2s)}')
-
-month = "all"
+"""
+month = "svm"
 months = "9"
-config = "Config 3"
+config = "Config 1"
 
 f2 = open(f'Clustering/results/{config}/{month}/CO_RF_pred.json')
 f3 = open(f'Clustering/results/{config}/{month}/testY.json')
@@ -89,8 +89,8 @@ print("----------------------------------------")
 '''
 
 
-station_405_pred = CO_pred[f"1_2022_{months}.csv"]
-station_405_true = testY[f"1_2022_{months}.csv"]
+station_405_pred = CO_pred[f"460_2022_{months}.csv"]
+station_405_true = testY[f"460_2022_{months}.csv"]
 plt.plot(station_405_pred, label="Prediction")
 plt.plot(station_405_true, label="Actual")
 
@@ -119,4 +119,5 @@ plt.legend()
 plt.xlabel("Hour")
 plt.ylabel("Number of Check-outs")
 plt.show()
+"""
 

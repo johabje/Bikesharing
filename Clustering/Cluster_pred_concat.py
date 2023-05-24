@@ -5,6 +5,9 @@ import json
 
 from sklearn.model_selection import RandomizedSearchCV
 
+import warnings
+warnings.filterwarnings("ignore")
+
 def trainRandom(X_train, Y_train, station):
 
     # Create the parameter grid based on the results of random search 
@@ -46,15 +49,27 @@ def getAreas(month, config):
 def getAreaData(area, months, config):
     data = pd.DataFrame()
     for month in months:
+        if month == "10":
+            try:
+                month_data = pd.read_csv(f"Data/Dataset_clusters/{config}/with_avail/{month}/{area[:-5]}{month}.csv", index_col=0)
+            except:
+                print("failed to find file for station ", area[:-5], " in month ", month[-1])
+                continue
+        else:
+            try:
+                month_data = pd.read_csv(f"Data/Dataset_clusters/{config}/with_avail/{month}/{area[:-5]}{month[-1]}.csv", index_col=0)
+            except:
+                print("failed to find file for station ", area[:-5], " in month ", month[-1])
+                continue
         try:
-            month_data = pd.read_csv(f"Data/Dataset_clusters/{config}/with_avail/{month}/{area[:-5]}{month[-1]}.csv", index_col=0)
+            month_data['count_last_hour'] = month_data['count_last_hour'].fillna(0)
+            data = data.append(month_data)
         except:
-            continue
-        month_data['count_last_hour'] = month_data['count_last_hour'].fillna(0)
-        data = data.append(month_data)
+            print("empty data for station ", area[:-5], " in month ", month[-1])
+   
         #drop all rows with NaN
-        data = data.dropna()
-        data = data.iloc[:-24*7]
+    data = data.fillna(0)
+    #data = data.iloc[:-24*7]
     return data
 
 
@@ -79,12 +94,9 @@ def Test_train_month(pred_periods, months, config):
         #print(data["Mean_close_count_last_hour"].head(2))
         test_data = data.iloc[-pred_periods:,:]
         
-        print(test_data)
         #store test Data
         X_test, Y_test = prepTestData(test_data)
         testX[station], testY[station] = X_test, list(Y_test)
-        print(X_test)
-        print(X_test.info())
 
         train_data = data.head(-(pred_periods-1))
         X_train = train_data.drop(columns=["count" ], inplace=False)
@@ -106,19 +118,24 @@ def Test_train_month(pred_periods, months, config):
         #last_pred = dict()
         for station in areas:
             prediction = models[station].predict(testX[station].iloc[[i]])
+            if prediction[0] < 0:
+                prediction[0] = 0
             #print(testX[station].iloc[[i]])
             CO_pred[station].append(prediction[0])
             #print(prediction[0])
             #last_pred[station]=prediction[0]
             testX[station]["count_last_hour"][i+1]= prediction[0]
-        
-    with open(f'Clustering/results/{config}/all/CO_RF_pred.json', 'w') as fp:
+    
+    if not os.path.exists(f'Clustering/results/{config}/rf'):
+        os.makedirs(f'Clustering/results/{config}/rf')
+
+    with open(f'Clustering/results/{config}/rf/CO_RF_pred.json', 'w') as fp:
         json.dump(CO_pred, fp)
-    with open(f'Clustering/results/{config}/all/testY.json', 'w') as fp:
+    with open(f'Clustering/results/{config}/rf/testY.json', 'w') as fp:
         json.dump(testY, fp)
 
 
-months = ["06", "07", "08", "09"]
+months = ["06", "07", "08", "09",]
 
 
-Test_train_month(24, months, "Config 3")
+#Test_train_month(24, months, "Config 1")
