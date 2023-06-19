@@ -3,7 +3,8 @@ from sklearn.ensemble import RandomForestRegressor
 import os
 import pandas as pd
 import json
-
+import warnings
+warnings.filterwarnings("ignore")
 from sklearn.model_selection import RandomizedSearchCV
 
 def trainRandom(X_train, Y_train, station):
@@ -52,14 +53,19 @@ def getAreaData(area, months):
             #drop all colums named something with dock
             month_data = month_data.drop(columns=[col for col in month_data.columns if 'dock' in col])
         except:
+            
             continue
         #print(month_data.info())
         #print(data.info())
         month_data['count_last_hour'] = month_data['count_last_hour'].fillna(0)
         data = data.append(month_data)
-        #drop all rows with NaN
-        data = data.dropna()
+        #replace all cells with NaNvalue
+        data = data.fillna(0)
+        data.drop(columns=["month"], inplace=True)
         data = data.iloc[:-24*7]
+    #change coulumn names
+    data.rename(columns={"Nedbør (1 t)": "precipitation", "Lufttemperatur": "temperature", "Skydekke": "cloud_cover", "Middelvind":"wind_speed" }, inplace=True)
+    print(data.info())
     return data
 
 def getFeatureImportance(station, model, X):
@@ -106,6 +112,7 @@ def Test_train_month(pred_periods, months):
         models[station] = trainRandom(X_train,Y_train, station)
         print("Area ", areas.index(station), " has been trained")
         if station == "460.0.csv" or station == "1023.0.csv":
+            
             print("Feature importance for station ", station, ":")
             getFeatureImportance(station, models[station], X_train)
 
@@ -130,7 +137,7 @@ def Test_train_month(pred_periods, months):
         json.dump(testY, fp)
 
 
-months = ["04","05","06", "07", "08", "09"]
+months = ["06_2021", "07_2021", "08_2021", "09_2021","04_2022","05_2022","06_2022", "07_2022", "08_2022", "09_2022"]
 
 
 Test_train_month(24, months)

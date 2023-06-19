@@ -2,7 +2,6 @@
 
 from Cluster_adjecent_stations import main as setneigbours
 from Dataset_Clusters import createDataset
-from Agglomerativeclustering import main as cluster
 from Cluster_pred_concat import Test_train_month as predRF
 from Cluster_pred_concat_svm import Test_train_month as predSVM
 from results_cluster import mean_RMSE, mean_MAE

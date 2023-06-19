@@ -4,6 +4,8 @@ import os
 import pandas as pd
 import json
 from sklearn.svm import SVR
+import warnings
+warnings.filterwarnings("ignore")
 
 import numpy as np
 def trainRandom(X_train, Y_train, station):
@@ -28,7 +30,7 @@ def prepTestData(test_data):
 def getAreas(month):
     print(month[-1])
 
-    stations=os.listdir(f"Data/Dataset_NoClusters/{month[-1]}")
+    stations=os.listdir(f"Data/Dataset_NoClusters/with_avail/{month[-1]}")
     print(stations)
     return stations
 
@@ -37,6 +39,7 @@ def getAreaData(area, months):
     for month in months:
         try:
             month_data = pd.read_csv(f"Data/Dataset_NoClusters/with_avail/{month}/{area}", index_col=0)
+            print(month_data.info())
             #drop all colums named something with dock
             month_data = month_data.drop(columns=[col for col in month_data.columns if 'dock' in col])
         except:
@@ -46,7 +49,8 @@ def getAreaData(area, months):
         month_data['count_last_hour'] = month_data['count_last_hour'].fillna(0)
         data = data.append(month_data)
         #drop all rows with NaN
-        data = data.dropna()
+        data = data.fillna(0)
+        data.drop(columns=["month"], inplace=True)
         data = data.iloc[:-24*7]
     return data
 
@@ -122,7 +126,8 @@ def Test_train_month(pred_periods, months):
         json.dump(testY, fp)
 
 
-months = ["06", "07", "08", "09"]
+months = ["06_2021", "07_2021", "08_2021", "09_2021","04_2022","05_2022","06_2022", "07_2022", "08_2022", "09_2022"]
+
 
 
 Test_train_month(24, months)

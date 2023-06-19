@@ -174,4 +174,10 @@ def main(tau, N):
     return clusters
     #nx.draw(graph, with_labels=Tr
 
-#main(0.5, 175)
+configs = [[0.05,1], [0.1,2], [0.15,3], [0.2,4], [0.25,5], [0.3,6], [0.35,7], [0.4,8], [0.45,9], [0.5,10]]
+for config in configs:
+    print("config: ", config)
+    cluster = main(config[0], 3)
+    
+    pd.DataFrame(cluster).to_csv(f"Clustering/results/clusters/{config[1]}.csv", index=False)
+            
