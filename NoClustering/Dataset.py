@@ -132,7 +132,7 @@ def stationDistances(year, month, stations):
 
 
 
-def main(tripdata, startTime, endTime):
+def main(tripdata, startTime, endTime, month):
     #find all unique stations in tripdata, as a list of integers
     stations = tripdata["start_station_id"].unique()
     print(stations)
@@ -154,26 +154,30 @@ def main(tripdata, startTime, endTime):
         df["isHoliday"] = df.index.isin(holidays.Norway(years=startTime.year).keys())
         # add count_last_hour to each record
         df["count_last_hour"] = df["count"].shift(1)
+        # add month to each record
+        df["month"] = df.index.month
         counts[station][0] = df
         # @todo find the closest station or cluster to each station/cluster and add the count from that station to each record
         # how do we define closest station or cluster to each station/cluster? mayby borders along a voronoi diagram? most close stations will be in the same cluster
 
         
-        
+    #if output folder does not exist, create it
+    if not os.path.exists(f'Data/Dataset_NoClusters/{month}_{startTime.year}'):
+        os.makedirs(f'Data/Dataset_NoClusters/{month}_{startTime.year}')
     #save counts to file
     for station in counts:
-        counts[station][0].to_csv(f'Data/Dataset_NoClusters/06/{station}_{startTime.year}_{startTime.month}.csv', index=True)
+        counts[station][0].to_csv(f'Data/Dataset_NoClusters/{month}_{startTime.year}/{station}_{startTime.year}_{startTime.month}.csv', index=True)
     return counts, stations
 
 
-startTime = dt.datetime(2022, 6, 1, 0, 0, 0)
-endTime = dt.datetime(2022, 6, 30, 23, 0, 0)
+month = "01"
+startTime = dt.datetime(2021, int(month), 1, 0, 0, 0)
+endTime = dt.datetime(2021, int(month), 30, 23, 0, 0)
 
-
-tripdata = pd.read_csv("Data/tripdata/2022/06.csv", parse_dates=True)
+tripdata = pd.read_csv(f"Data/tripdata/2021/{month}.csv", parse_dates=True)
 tripdata["started_at"] = pd.to_datetime(tripdata["started_at"])
 tripdata["count"] = 1
 tripdata.drop(columns=["ended_at", "start_station_name", "end_station_id", "end_station_name", "start_station_description","end_station_description","duration", "start_station_latitude" , "start_station_longitude",  "end_station_latitude",  "end_station_longitude" ], inplace=True)
 tripdata.set_index('started_at', inplace=True)
-counts, stations = main(tripdata, startTime, endTime)
+counts, stations = main(tripdata, startTime, endTime, month)
 

@@ -21,8 +21,8 @@ def mean_r2(CO_pred, testY):
     r2s.pop(0)
     print( f'Mean r2 is: {sum(r2s) / len(r2s)}')
     #r2s.remove(-70.05087536729536)
-    plt.plot(r2s)
-    plt.show()
+    #plt.plot(r2s)
+    #plt.show()
     
 
 def mean_MAE(CO_pred, testY):
@@ -36,6 +36,7 @@ def mean_MAE(CO_pred, testY):
     print( f'Mean MAE is: {sum(r2s) / len(r2s)}')
     plt.plot(r2s)
     plt.show()
+
 def mean_RMSE(CO_pred, testY):
     r2s = []
     for key in CO_pred:
@@ -50,8 +51,8 @@ month = "all"
 months = "9"
 config = "Config 2"
 
-f2 = open(f'NoClustering/results/no_avail/{month}/CO_RF_pred.json')
-f3 = open(f'NoClustering/results/no_avail/{month}/testY.json')
+f2 = open(f'NoClustering/results/with_avail/{month}/CO_RF_pred.json')
+f3 = open(f'NoClustering/results/with_avail/{month}/testY.json')
 
 
 #f5 = open('results/CO_RF_pred.json')
@@ -88,9 +89,9 @@ mean_RMSE(CI_RF_pred, CI_true)
 print("----------------------------------------")
 '''
 
-station1 = "463.0.csv"
-station2 = "468.0.csv"
-station3 = "460.0.csv"
+station1 = "480.0.csv"
+station2 = "460.0.csv"
+station3 = "1023.0.csv"
 
 
 station_405_pred = CO_pred[station1]
